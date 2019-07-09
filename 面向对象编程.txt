@@ -1,0 +1,198 @@
+面向对象，OOP，是一种程序设计思想。OOP把对象作为程序的基本单元，一个对象包含了数据可数据操作的函数。
+
+在python 中，一切的数据类型可以视为对象，当然也可以自定义对象。
+class Student（object）
+    def__init__(self,name,score)
+		self.name=name
+		self.score=score
+init 定义的是实例属性，即在创建新对象所绑定的属性名。这个与类属性不同，不仅在声明上，也在使用上。
+实例属性也可以在实例对象声明后，临时操作。
+
+bart = Student（‘JOHN’，90） 创建实例
+
+
+数据封装
+OOP的特点之一，把数据封装起来，通过类方法来调用。
+class Student(object):
+
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
+
+    def print_score(self):
+        print('%s: %s' % (self.name, self.score))
+
+访问可见性问题
+私有变量 以两个下划线开头，语法中并没完全保证属性的私有性，只不过更换了名字罢了。We are all consenting adults here
+class Test:
+
+    def __init__(self, foo):
+        self.__foo = foo
+
+    def __bar(self):
+        print(self.__foo)
+        print('__bar')
+
+
+def main():
+    test = Test('hello')
+    test._Test__bar()
+    print(test._Test__foo)
+
+
+if __name__ == "__main__":
+    main()
+	
+
+	
+类对象与实例对象
+
+class Dog:
+
+kind = 'canine'         # class variable shared by all instances
+
+def __init__(self, name):
+	self.name = name    # instance variable unique to each instance
+
+>>> d = Dog('Fido')
+>>> e = Dog('Buddy')
+>>> d.kind                  # shared by all dogs
+'canine'
+>>> e.kind                  # shared by all dogs
+'canine'
+>>> d.name                  # unique to d
+'Fido'
+>>> e.name                  # unique to e
+'Buddy'
+
+
+	
+静态方法与类方法
+类中的方法，定义必须是function（self），第一个参数必须是self开头，表示把实例方法传入类中，
+但定义一个不是对象方法，就使用静态方法。
+类方法 第一个参数是cls
+from time import time, localtime, sleep
+
+
+class Clock(object):
+    """数字时钟"""
+
+    def __init__(self, hour=0, minute=0, second=0):
+        self._hour = hour
+        self._minute = minute
+        self._second = second
+
+    @classmethod
+    def now(cls):
+        ctime = localtime(time())
+        return cls(ctime.tm_hour, ctime.tm_min, ctime.tm_sec)
+
+    def run(self):
+        """走字"""
+        self._second += 1
+        if self._second == 60:
+            self._second = 0
+            self._minute += 1
+            if self._minute == 60:
+                self._minute = 0
+                self._hour += 1
+                if self._hour == 24:
+                    self._hour = 0
+
+    def show(self):
+        """显示时间"""
+        return '%02d:%02d:%02d' % \
+               (self._hour, self._minute, self._second)
+
+
+def main():
+    # 通过类方法创建对象并获取系统时间
+    clock = Clock.now()
+    while True:
+        print(clock.show())
+        sleep(1)
+        clock.run()
+
+
+if __name__ == '__main__':
+    main()
+
+	
+	
+继承
+子类可以继承父类的属性和方法，可以在方法的基础上改变，这就是多态。
+静态语言 vs 动态语言
+对于静态语言（例如Java）来说，如果需要传入Animal类型，则传入的对象必须是Animal类型或者它的子类，否则，将无法调用run()方法。
+
+对于Python这样的动态语言来说，则不一定需要传入Animal类型。我们只需要保证传入的对象有一个run()方法就可以了：
+
+class Timer(object):
+    def run(self):
+        print('Start...')
+这就是动态语言的“鸭子类型”，它并不要求严格的继承体系，一个对象只要“看起来像鸭子，走起路来像鸭子”，那它就可以被看做是鸭子。
+
+Python的“file-like object“就是一种鸭子类型。对真正的文件对象，它有一个read()方法，返回其内容。但是，许多对象，只要有read()方法，都被视为“file-like object“。许多函数接收的参数就是“file-like object“，你不一定要传入真正的文件对象，完全可以传入任何实现了read()方法的对象。
+
+小结
+继承可以把父类的所有功能都直接拿过来，这样就不必重零做起，子类只需要新增自己特有的方法，也可以把父类不适合的方法覆盖重写。
+
+动态语言的鸭子类型特点决定了继承不像静态语言那样是必须的。
+
+
+
+上面的代码能够顺利的执行并且打印出100和“hello”，但我们注意到了，在bar函数的内部并没有定义a和b两个变量，那么a和b是从哪里来的。
+我们在上面代码的if分支中定义了一个变量a，这是一个全局变量（global variable），属于全局作用域，因为它没有定义在任何一个函数中
+。在上面的foo函数中我们定义了变量b，这是一个定义在函数中的局部变量（local variable），属于局部作用域，在foo函数的外部并不能访
+问到它；但对于foo函数内部的bar函数来说，变量b属于嵌套作用域，在bar函数中我们是可以访问到它的。bar函数中的变量c属于局部作用域
+，在bar函数之外是无法访问的。事实上，Python查找一个变量时会按照“局部作用域”、“嵌套作用域”、“全局作用域”和“内置作用域”的顺序进
+行搜索，前三者我们在上面的代码中已经看到了，所谓的“内置作用域”就是Python内置的那些隐含标识符min、len等都属于内置作用域）。
+def foo():
+    b = 'hello'
+
+    def bar():  # Python中可以在函数内部再定义函数
+        c = True
+        print(a)
+        print(b)
+        print(c)
+
+    bar()
+    # print(c)  # NameError: name 'c' is not defined
+
+
+if __name__ == '__main__':
+    a = 100
+    # print(b)  # NameError: name 'b' is not defined
+    foo()
+	
+再看看下面这段代码，我们希望通过函数调用修改全局变量a的值，但实际上下面的代码是做不到的。
+def foo():
+    a = 200
+    print(a)  # 200
+
+
+if __name__ == '__main__':
+    a = 100
+    foo()
+    print(a)  # 100
+	
+在调用foo函数后，我们发现a的值仍然是100，这是因为当我们在函数foo中写a = 200的时候，是重新定义了一个名字为a的局部变量，
+它跟全局作用域的a并不是同一个变量，因为局部作用域中有了自己的变量a，因此foo函数不再搜索全局作用域中的a。如果我们希望
+在foo函数中修改全局作用域中的a，代码如下所示。
+def foo():
+    global a
+    a = 200
+    print(a)  # 200
+
+
+if __name__ == '__main__':
+    a = 100
+    foo()
+    print(a)  # 200
+	
+	我们可以使用global关键字来指示foo函数中的变量a来自于全局作用域，如果全局作用域中没有a，那么下面一行的代码就会定义变量a并将其置于全局作用域。同理，如果我们希望函数内部的函数能够修改嵌套作用域中的变量，可以使用nonlocal关键字来指示变量来自于嵌套作用域，请大家自行试验。
+
+在实际开发中，我们应该尽量减少对全局变量的使用，因为全局变量的作用域和影响过于广泛，可能会发生意料之外的修改和使用，除此之外
+全局变量比局部变量拥有更长的生命周期，可能导致对象占用的内存长时间无法被垃圾回收。事实上，减少对全局变量的使用，也是降低代码
+之间耦合度的一个重要举措，同时也是对迪米特法则的践行。减少全局变量的使用就意味着我们应该尽量让变量的作用域在函数的内部，但是
+如果我们希望将一个局部变量的生命周期延长，使其在函数调用结束后依然可以访问，这时候就需要使用闭包，这个我们在后续的内容中进行
+讲解。
